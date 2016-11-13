@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>HomeMng</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.2.3/css/bulma.min.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+  <link rel='stylesheet' href='/stylesheets/style.css' />
+  <style>
+    html {
+      background-color: #fff;
+    }
+
+    .u-mb20 {
+      margin-bottom: 20px;
+    }
+
+    .glb-nav {
+      border-bottom: 1px #dbdbdb solid;
+    }
+
+    .sub-title {
+      font-size: 20px;
+      border-bottom: 1px solid #ccc;
+    }
+
+    .ac-play {
+      color: #11a811;
+    }
+
+    .ac-stop {
+      color: #e41616;
+    }
+  </style>
+</head>
+
+<body>
+  <nav class="nav glb-nav u-mb20">
+    <div class="nav-center">
+      <a class="nav-item" href="#">
+      Turku
+    </a>
+    </div>
+  </nav>
+
+  <div class="container has-text-centered center-alert">
+    <div class="sub-title u-mb20">エアコン設定</div>
+    <div class="columns">
+      <div class="column is-half">
+        <h6>現在のエアコンの状態は</h6>
+      </div>
+      <div class="column is-half">
+        <span class="js-state-output"><a class="button is-loading is-warning">Loading</a></span>
+      </div>
+    </div>
+    <div class="columns">
+      <div class="column is-half">
+        <a class="button is-success is-large js-aircon-on">電源ON</a>
+      </div>
+      <div class="column is-half">
+        <a class="button is-danger is-large js-aircon-off">電源OFF</a>
+      </div>
+    </div>
+  </div>
+
+  <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/3.6.0/firebase.js"></script>
+  <script>
+    // Initialize Firebase
+    var config = {
+      apiKey: "AIzaSyCAd6q75i1MoE0j9SDDFovRnKUe5yMyaiw",
+      authDomain: "my-airconditioner.firebaseapp.com",
+      databaseURL: "https://my-airconditioner.firebaseio.com",
+      storageBucket: "my-airconditioner.appspot.com",
+      messagingSenderId: "814436074889"
+    };
+    firebase.initializeApp(config);
+
+    var database = firebase.database();
+
+    // Subscriber
+    database.ref('/').child("acState").on("value", function(snapshot) {
+
+      var state;
+      if(snapshot.val()) {
+        state = "<h3 class='title ac-play'>稼働中です</h3>";
+        $('.js-aircon-on').addClass('is-disabled');
+        $('.js-aircon-off').removeClass('is-disabled');
+        $('.js-aircon-off').addClass('is-active');
+      } else {
+        state = "<h3 class='title ac-stop'>稼働していません</h3>";
+        $('.js-aircon-off').addClass('is-disabled');
+        $('.js-aircon-on').removeClass('is-disabled');
+        $('.js-aircon-on').addClass('is-active');
+      }
+
+      $('.js-state-output').html(state);
+    });
+
+    // Publisher
+    $('.js-aircon-on').click(function() {
+      database.ref('/').set({messages: true, acState: true});
+    });
+    $('.js-aircon-off').click(function() {
+      database.ref('/').set({messages: false, acState: false});
+    });
+  </script>
+</body>
